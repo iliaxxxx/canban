@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - claude/setup-env-file-01DB1xBGgxxyDitWS1TBKux2
   workflow_dispatch:
 
 permissions:
