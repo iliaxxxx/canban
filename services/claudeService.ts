@@ -4,12 +4,14 @@ import { SocialPlatform, Task } from "../types";
 // CONFIGURATION
 // ========================================
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY ||
+                localStorage.getItem('anthropic_api_key') ||
+                '';
 const AI_REQUEST_TIMEOUT = 60000; // 60 seconds for Claude
 
 // Validate API key on initialization
 if (!API_KEY) {
-    console.error('CRITICAL: API_KEY is not set. AI features will not work.');
+    console.warn('WARNING: ANTHROPIC API_KEY is not set. AI features will not work. Please add VITE_ANTHROPIC_API_KEY to environment.');
 }
 
 // ========================================

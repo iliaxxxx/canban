@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Competitor, SocialPlatform, Task, CompetitorPost, InstagramAnalysisResult } from '../types';
 import { Plus, Trash2, Search, Loader2, X, Instagram, Copy, RefreshCw, Smartphone, AlertCircle, WifiOff, Zap, Settings, PlayCircle, Eye, Heart, MessageCircle, BarChart2, ArrowRight, Flame, ArrowLeft, FileText } from 'lucide-react';
-import { analyzeInstagramContent, rewriteCompetitorIdea } from '../services/geminiService';
+import { analyzeInstagramContent, rewriteCompetitorIdea } from '../services/claudeService';
 import { analyzeReelWithGroq, rewriteReelWithGroq } from '../services/groqService';
 import { storageService } from '../services/storageService';
 
