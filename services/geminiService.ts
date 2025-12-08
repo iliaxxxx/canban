@@ -5,13 +5,16 @@ import { SocialPlatform, Task } from "../types";
 // CONFIGURATION
 // ========================================
 
-// Compatible key access
-const apiKey = process.env.API_KEY;
+// Compatible key access - try multiple sources
+const apiKey = import.meta.env.VITE_API_KEY ||
+               import.meta.env.VITE_ANTHROPIC_API_KEY ||
+               localStorage.getItem('gemini_api_key') ||
+               '';
 const AI_REQUEST_TIMEOUT = 30000; // 30 seconds
 
 // Validate API key on initialization
 if (!apiKey) {
-    console.error('CRITICAL: API_KEY is not set. AI features will not work.');
+    console.warn('WARNING: API_KEY is not set. AI features will not work. Please add VITE_API_KEY to environment or set it in Settings.');
 }
 
 // Initialize AI client only if key exists
