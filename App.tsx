@@ -300,12 +300,26 @@ export default function App() {
   const handleUpdateTaskSlides = (taskId: string, slides: Slide[]) => storageService.updateTask(taskId, { carouselSlides: slides });
 
   const handleAddAITasks = async (newTasks: Omit<Task, 'id' | 'columnId' | 'projectId'>[]) => {
-      if (!activeProjectId) return;
-      for (const t of newTasks) {
-          await storageService.addTask({
-              ...t, id: Date.now().toString() + Math.random(), columnId: 'ideas', projectId: activeProjectId, authorId: currentUser?.id
-          } as Task);
+      console.log('handleAddAITasks called with:', newTasks.length, 'tasks');
+      console.log('activeProjectId:', activeProjectId);
+
+      if (!activeProjectId) {
+          console.error('No active project ID!');
+          return;
       }
+
+      for (const t of newTasks) {
+          const newTask = {
+              ...t,
+              id: Date.now().toString() + Math.random(),
+              columnId: 'ideas',
+              projectId: activeProjectId,
+              authorId: currentUser?.id
+          } as Task;
+          console.log('Adding task:', newTask);
+          await storageService.addTask(newTask);
+      }
+      console.log('All tasks added successfully');
   };
   
   const handleCardClick = (task: Task) => {
