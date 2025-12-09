@@ -6,12 +6,13 @@ import { SocialPlatform, Task } from "../types";
 // ========================================
 
 // Compatible key access
-const apiKey = process.env.API_KEY;
+// In Vite, use import.meta.env with VITE_ prefix for client-side variables
+const apiKey = import.meta.env.VITE_API_KEY;
 const AI_REQUEST_TIMEOUT = 30000; // 30 seconds
 
 // Validate API key on initialization
 if (!apiKey) {
-    console.error('CRITICAL: API_KEY is not set. AI features will not work.');
+    console.error('CRITICAL: VITE_API_KEY is not set. AI features will not work.');
 }
 
 // Initialize AI client only if key exists
@@ -28,7 +29,7 @@ const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 const checkAIAvailability = (): void => {
     if (!ai) {
         throw new Error(
-            'AI service is not configured. Please set API_KEY in your environment variables.'
+            'AI service is not configured. Please set VITE_API_KEY in your environment variables.'
         );
     }
 };

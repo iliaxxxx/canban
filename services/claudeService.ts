@@ -4,12 +4,13 @@ import { SocialPlatform, Task } from "../types";
 // CONFIGURATION
 // ========================================
 
-const API_KEY = process.env.ANTHROPIC_API_KEY || process.env.API_KEY;
+// In Vite, use import.meta.env with VITE_ prefix for client-side variables
+const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 const AI_REQUEST_TIMEOUT = 60000; // 60 seconds for Claude
 
 // Validate API key on initialization
 if (!API_KEY) {
-    console.error('CRITICAL: ANTHROPIC_API_KEY is not set. AI features will not work.');
+    console.error('CRITICAL: VITE_ANTHROPIC_API_KEY is not set. AI features will not work.');
 }
 
 // ========================================
@@ -22,7 +23,7 @@ if (!API_KEY) {
 const checkAIAvailability = (): void => {
     if (!API_KEY) {
         throw new Error(
-            'AI service is not configured. Please set ANTHROPIC_API_KEY in your environment variables.'
+            'AI service is not configured. Please set VITE_ANTHROPIC_API_KEY in your environment variables.'
         );
     }
 };
