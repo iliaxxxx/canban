@@ -48,8 +48,9 @@ export const AIGenerator: React.FC<AIGeneratorProps> = ({ isOpen, onClose, onAdd
             setError("Не удалось сгенерировать идеи. AI вернул пустой результат.");
         }
     } catch (err) {
-        console.error(err);
-        setError("Ошибка при сохранении задач. Попробуйте еще раз.");
+        console.error('AI Generator Error:', err);
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        setError(`Ошибка: ${errorMessage}`);
     } finally {
         setIsLoading(false);
     }
@@ -78,8 +79,9 @@ export const AIGenerator: React.FC<AIGeneratorProps> = ({ isOpen, onClose, onAdd
               setError("Не удалось создать стратегию. Проверьте API подключение.");
           }
       } catch (err) {
-          console.error(err);
-          setError("Ошибка при сохранении стратегии.");
+          console.error('Magic Plan Error:', err);
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          setError(`Ошибка: ${errorMessage}`);
       } finally {
           setIsLoading(false);
       }
