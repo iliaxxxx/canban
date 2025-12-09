@@ -12,8 +12,8 @@
 # Запустите скрипт миграции
 ./migrate.sh
 
-# Добавьте ваш API ключ в .env.local
-# ANTHROPIC_API_KEY=sk-ant-...
+# Добавьте ваш API ключ в .env
+# VITE_ANTHROPIC_API_KEY=sk-ant-...
 
 # Установите зависимости и запустите
 npm install
@@ -31,18 +31,21 @@ npm run dev
 | До (Gemini) | После (Claude) |
 |-------------|----------------|
 | `@google/genai` | `@anthropic-ai/sdk` |
-| `GEMINI_API_KEY` | `ANTHROPIC_API_KEY` |
+| `GEMINI_API_KEY` | `VITE_ANTHROPIC_API_KEY` |
 | `geminiService.ts` | `claudeService.ts` |
 | `gemini-2.5-flash` | `claude-sonnet-4-20250514` |
+| `process.env` | `import.meta.env` |
 
 ---
 
 ## 🔧 Конфигурация
 
-**`.env.local`:**
+**`.env`:**
 ```env
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
+VITE_ANTHROPIC_API_KEY=your_anthropic_api_key_here
 ```
+
+> **Важно:** В Vite все клиентские переменные окружения должны иметь префикс `VITE_`
 
 Получите API ключ на https://console.anthropic.com/
 
@@ -207,7 +210,7 @@ const slides = await generateCarouselSlides('10 способов повысит�
 ## 🐛 Troubleshooting
 
 **Ошибка: "AI service is not configured"**
-→ Проверьте `ANTHROPIC_API_KEY` в `.env.local`
+→ Проверьте `VITE_ANTHROPIC_API_KEY` в `.env` и перезапустите dev-сервер
 
 **Ошибка: "AI request timeout"**
 → Проверьте интернет-соединение
