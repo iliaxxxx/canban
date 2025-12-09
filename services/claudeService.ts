@@ -4,28 +4,11 @@ import { SocialPlatform, Task } from "../types";
 // CONFIGURATION
 // ========================================
 
-const API_KEY = process.env.ANTHROPIC_API_KEY || process.env.API_KEY;
 const AI_REQUEST_TIMEOUT = 60000; // 60 seconds for Claude
-
-// Validate API key on initialization
-if (!API_KEY) {
-    console.error('CRITICAL: ANTHROPIC_API_KEY is not set. AI features will not work.');
-}
 
 // ========================================
 // HELPER FUNCTIONS
 // ========================================
-
-/**
- * Check if AI service is available
- */
-const checkAIAvailability = (): void => {
-    if (!API_KEY) {
-        throw new Error(
-            'AI service is not configured. Please set ANTHROPIC_API_KEY in your environment variables.'
-        );
-    }
-};
 
 /**
  * Safe error logging with context
@@ -96,24 +79,23 @@ const callClaudeWithTimeout = async (
     systemPrompt: string,
     maxTokens: number = 4096
 ): Promise<string> => {
-    checkAIAvailability();
-
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), AI_REQUEST_TIMEOUT);
 
     try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
+        // Call our serverless API endpoint instead of Anthropic directly
+        const response = await fetch('/api/claude', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': API_KEY!,
-                'anthropic-version': '2023-06-01'
             },
             body: JSON.stringify({
                 model: 'claude-sonnet-4-20250514',
                 max_tokens: maxTokens,
-                system: systemPrompt,
-                messages: messages
+                messages: [
+                    ...( systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
+                    ...messages
+                ]
             }),
             signal: controller.signal
         });
@@ -126,7 +108,7 @@ const callClaudeWithTimeout = async (
         }
 
         const data = await response.json();
-        
+
         if (!data.content || !data.content[0] || !data.content[0].text) {
             throw new Error('Invalid response format from Claude API');
         }
@@ -134,11 +116,9 @@ const callClaudeWithTimeout = async (
         return data.content[0].text;
     } catch (error) {
         clearTimeout(timeoutId);
-        
         if (error instanceof Error && error.name === 'AbortError') {
             throw new Error(`Request timeout after ${AI_REQUEST_TIMEOUT / 1000} seconds`);
         }
-        
         throw error;
     }
 };
@@ -227,8 +207,6 @@ export const generateContentScript = async (
     additionalContext: string = ''
 ): Promise<string> => {
     try {
-        checkAIAvailability();
-        
         const config = platformConfigs[platform];
         
         const systemPrompt = `Ты эксперт по созданию контента для социальных сетей с опытом работы в российском digital-маркетинге.
@@ -289,8 +267,6 @@ export const generateCarouselSlides = async (
     style: string = 'educational'
 ): Promise<Array<{ title: string; content: string; designNotes: string }>> => {
     try {
-        checkAIAvailability();
-
         const styleDescriptions: Record<string, string> = {
             educational: 'Образовательный - факты, статистика, полезная информация',
             storytelling: 'Сторителлинг - история с драматургией и эмоциями',
@@ -362,8 +338,6 @@ export const repurposeContent = async (
     toPlatform: SocialPlatform
 ): Promise<string> => {
     try {
-        checkAIAvailability();
-
         const fromConfig = platformConfigs[fromPlatform];
         const toConfig = platformConfigs[toPlatform];
 
@@ -421,8 +395,6 @@ export const analyzeCompetitor = async (
     platform: SocialPlatform
 ): Promise<string> => {
     try {
-        checkAIAvailability();
-
         const config = platformConfigs[platform];
 
         const systemPrompt = `Ты аналитик контента в digital-маркетинге, специализирующийся на competitive intelligence.
@@ -494,8 +466,6 @@ export const generateContentIdeas = async (
     count: number = 10
 ): Promise<Array<{ title: string; description: string; platform: string }>> => {
     try {
-        checkAIAvailability();
-
         const toneDescriptions: Record<string, string> = {
             neutral: 'Нейтральный, профессиональный',
             provocative: 'Провокационный, дерзкий стиль Саши Степановой',
@@ -585,8 +555,6 @@ export const generateStrategicPlan = async (
     tone: string = 'neutral'
 ): Promise<Array<{ title: string; description: string; platform: string; date?: string }>> => {
     try {
-        checkAIAvailability();
-
         const toneDescriptions: Record<string, string> = {
             neutral: 'Нейтральный, профессиональный',
             provocative: 'Провокационный, дерзкий стиль Саши Степановой',
@@ -675,8 +643,6 @@ export const analyzeInstagramContent = async (
     caption: string
 ): Promise<{ hook: string; coreMessage: string; structure: string; recommendations: string }> => {
     try {
-        checkAIAvailability();
-
         const systemPrompt = `Ты эксперт по анализу контента в Instagram Reels с глубоким пониманием механики виральности.
 
 Твоя задача - разобрать контент на ключевые элементы:
@@ -752,8 +718,6 @@ export const rewriteCompetitorIdea = async (
     platform: SocialPlatform
 ): Promise<{ title: string; description: string }> => {
     try {
-        checkAIAvailability();
-
         const config = platformConfigs[platform];
 
         const systemPrompt = `Ты креативный копирайтер, специализирующийся на адаптации контент-идей.
