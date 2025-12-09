@@ -240,13 +240,13 @@ export default function App() {
         
         try {
             if (task.platform === 'instagram_post') {
-                const slides = await generateCarouselSlides(task.title);
+                const slides = await generateCarouselSlides(task.title, 5, 'educational');
                 const slidesWithIds = slides.map((s, i) => ({ ...s, id: i.toString() }));
                 clearInterval(progressInterval);
                 setTaskProgress(prev => ({ ...prev, [task.id]: 100 }));
                 await storageService.updateTask(task.id, { description: 'Слайды готовы!', carouselSlides: slidesWithIds });
             } else {
-                const script = await generateContentScript(task);
+                const script = await generateContentScript(task.title, task.platform, task.description || '');
                 clearInterval(progressInterval);
                 setTaskProgress(prev => ({ ...prev, [task.id]: 100 }));
                 await storageService.updateTask(task.id, { description: script });

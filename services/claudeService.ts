@@ -330,60 +330,68 @@ export const generateCarouselSlides = async (
 };
 
 /**
- * Repurpose content for different platform
+ * Repurpose content for different platforms
+ * Takes a task and creates adaptations for other platforms
  */
 export const repurposeContent = async (
-    originalContent: string,
-    fromPlatform: SocialPlatform,
-    toPlatform: SocialPlatform
-): Promise<string> => {
+    originalTask: Task
+): Promise<{ title: string; description: string; platform: string }[]> => {
     try {
-        const fromConfig = platformConfigs[fromPlatform];
-        const toConfig = platformConfigs[toPlatform];
+        const systemPrompt = `Ты контент-стратег, специализирующийся на адаптации контента между платформами.
 
-        const systemPrompt = `Ты эксперт по адаптации контента между различными социальными платформами.
+Твоя задача - создать адаптации контента для разных платформ, сохраняя ключевое сообщение.
 
-Твоя задача - не просто переписать контент, а адаптировать его под специфику новой платформы:
-1. Изменить формат подачи
-2. Адаптировать длину и стиль
-3. Сохранить ключевое сообщение
-4. Оптимизировать под алгоритмы новой платформы`;
+Формат ответа - только JSON массив.`;
 
-        const userPrompt = `Адаптируй этот контент:
+        const userPrompt = `Переупакуй этот контент для других платформ:
 
-ОРИГИНАЛЬНЫЙ КОНТЕНТ (${fromConfig.platform}):
-${originalContent}
+ИСХОДНЫЙ КОНТЕНТ:
+Платформа: ${originalTask.platform}
+Название: ${originalTask.title}
+Описание: ${originalTask.description || 'Нет описания'}
 
-ЦЕЛЕВАЯ ПЛАТФОРМА: ${toConfig.platform}
+ЗАДАЧА: Создай 2 адаптации для других платформ:
+1. Для Telegram (если оригинал не Telegram)
+2. Для YouTube Shorts (если оригинал не YouTube)
 
-Характеристики целевой платформы:
-- Формат: ${toConfig.format}
-- ${toConfig.duration !== 'N/A' ? `Длительность: ${toConfig.duration}` : ''}
-- Стиль: ${toConfig.style}
-- ${toConfig.maxLength ? `Макс. длина: ${toConfig.maxLength} символов` : ''}
+Если исходник уже для одной из этих платформ, замени её на Instagram Reels или Instagram Post.
 
-Особенности адаптации:
-${toConfig.hooks.map(h => `- ${h}`).join('\n')}
+Верни JSON массив:
+[
+  {
+    "title": "Название адаптированного контента",
+    "description": "Детальное описание сценария для новой платформы",
+    "platform": "telegram|youtube|instagram_reels|instagram_post"
+  }
+]
 
-Создай адаптированную версию контента, которая:
-1. Сохраняет ключевое сообщение оригинала
-2. Полностью соответствует формату целевой платформы
-3. Использует специфические для платформы приёмы вовлечения
-4. Готова к публикации без дополнительной обработки
+Требования:
+- Сохрани ключевую идею оригинала
+- Адаптируй под специфику каждой платформы
+- Создай готовый к использованию контент
+- Учти форматы и стиль целевых платформ
 
-Если это видео-контент, опиши визуальный ряд и текст/озвучку.
-Если текстовый - структурируй согласно лучшим практикам платформы.`;
+Верни ТОЛЬКО JSON массив, без форматирования.`;
 
         const messages = [
             { role: 'user', content: userPrompt }
         ];
 
         const response = await callClaudeWithTimeout(messages, systemPrompt, 4096);
-        
-        return response || 'Не удалось адаптировать контент';
+
+        const adaptations = safeParseJSON<Array<{ title: string; description: string; platform: string }>>(
+            response,
+            []
+        );
+
+        if (adaptations.length === 0) {
+            throw new Error('Не удалось создать адаптации контента');
+        }
+
+        return adaptations;
     } catch (error) {
         safeLog(error, 'repurposeContent');
-        throw new Error('Ошибка при адаптации контента');
+        return [];
     }
 };
 
