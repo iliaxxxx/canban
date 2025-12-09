@@ -4,7 +4,23 @@ import { SocialPlatform, Task } from "../types";
 // CONFIGURATION
 // ========================================
 
-const API_KEY = process.env.ANTHROPIC_API_KEY || process.env.API_KEY;
+// Get API key from environment (Vite requires VITE_ prefix)
+const getApiKey = (): string | undefined => {
+    // Debug logging
+    console.log('Claude Service - API Key Debug:');
+    console.log('import.meta.env.VITE_ANTHROPIC_API_KEY:', import.meta.env.VITE_ANTHROPIC_API_KEY);
+
+    // Try localStorage as fallback
+    const localStorageKey = localStorage.getItem('ANTHROPIC_API_KEY');
+    console.log('localStorage.getItem:', localStorageKey ? 'FOUND' : 'MISSING');
+
+    const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY || localStorageKey || undefined;
+    console.log('Final API_KEY:', apiKey ? 'SET' : 'NOT SET');
+
+    return apiKey;
+};
+
+const API_KEY = getApiKey();
 const AI_REQUEST_TIMEOUT = 60000; // 60 seconds for Claude
 
 // Validate API key on initialization
