@@ -22,12 +22,24 @@ export default async function handler(
       return res.status(400).json({ error: 'Messages array is required' });
     }
 
-    // Make request to Claude API
-    const response = await anthropic.messages.create({
+    // Extract system message from messages array
+    const systemMessage = messages.find((msg: any) => msg.role === 'system');
+    const filteredMessages = messages.filter((msg: any) => msg.role !== 'system');
+
+    // Prepare API request parameters
+    const apiParams: any = {
       model,
       max_tokens,
-      messages,
-    });
+      messages: filteredMessages,
+    };
+
+    // Add system parameter if system message exists
+    if (systemMessage?.content) {
+      apiParams.system = systemMessage.content;
+    }
+
+    // Make request to Claude API
+    const response = await anthropic.messages.create(apiParams);
 
     // Return the response
     return res.status(200).json(response);
