@@ -9,9 +9,15 @@ const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY ||
                 '';
 const AI_REQUEST_TIMEOUT = 60000; // 60 seconds for Claude
 
+// Debug logging
+console.log('Claude Service - API Key Debug:');
+console.log('  import.meta.env.VITE_ANTHROPIC_API_KEY:', import.meta.env.VITE_ANTHROPIC_API_KEY ? 'EXISTS' : 'MISSING');
+console.log('  localStorage.getItem:', localStorage.getItem('anthropic_api_key') ? 'EXISTS' : 'MISSING');
+console.log('  Final API_KEY:', API_KEY ? 'SET (length: ' + API_KEY.length + ')' : 'NOT SET');
+
 // Validate API key on initialization
 if (!API_KEY) {
-    console.warn('WARNING: ANTHROPIC API_KEY is not set. AI features will not work. Please add VITE_ANTHROPIC_API_KEY to environment.');
+    console.error('CRITICAL: ANTHROPIC API_KEY is not set. AI features will not work.');
 }
 
 // ========================================
