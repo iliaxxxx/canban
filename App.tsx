@@ -11,7 +11,7 @@ import { BoardEditor } from './components/BoardEditor';
 import { TeamModal } from './components/TeamModal';
 import { ProjectSelector } from './components/ProjectSelector';
 import { storageService } from './services/storageService';
-import { generateContentScript, generateCarouselSlides, repurposeContent } from './services/geminiService';
+import { generateContentScript, generateCarouselSlides, repurposeContent } from './services/claudeService';
 import { Layout, Search, Settings, Send, Music2, Youtube, AtSign, StickyNote, Plus, X, Trash2, Film, Images, Sparkles, Calendar, LogOut, UserPlus, Users, Edit3, Flame, Wifi, Zap, RefreshCw, WifiOff, PenLine, Eye } from 'lucide-react';
 
 interface TaskDetailsModalProps {

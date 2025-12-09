@@ -1,7 +1,7 @@
 
 
 import React, { useState, useRef, useEffect } from 'react';
-import { generateCarouselSlides } from '../services/geminiService';
+import { generateCarouselSlides } from '../services/claudeService';
 import { Download, Sparkles, Loader2, Image as ImageIcon, Type, Trash2, Plus, Palette, Upload, Eraser, AtSign, ArrowLeft, LayoutTemplate, BoxSelect, Droplet, Save, FolderOpen, FileText } from 'lucide-react';
 import { Task, Slide } from '../types';
 

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { generateContentIdeas, generateStrategicPlan } from '../services/geminiService';
+import { generateContentIdeas, generateStrategicPlan } from '../services/claudeService';
 import { Sparkles, Loader2, X, ChevronDown, Mic2, Film, User, Zap, Calendar, Lightbulb, AlertCircle } from 'lucide-react';
 import { Task, SocialPlatform } from '../types';
 
