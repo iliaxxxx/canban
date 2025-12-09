@@ -574,7 +574,8 @@ ${platform === 'instagram_reels' || platform === 'all' ? `ФОРМАТ REELS: ${
         return ideas;
     } catch (error) {
         safeLog(error, 'generateContentIdeas');
-        throw new Error('Ошибка при генерации идей контента');
+        // Re-throw the original error instead of generic message
+        throw error;
     }
 };
 
@@ -666,7 +667,8 @@ export const generateStrategicPlan = async (
         return plan;
     } catch (error) {
         safeLog(error, 'generateStrategicPlan');
-        throw new Error('Ошибка при создании стратегического плана');
+        // Re-throw the original error instead of generic message
+        throw error;
     }
 };
 
