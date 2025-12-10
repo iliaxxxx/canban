@@ -173,12 +173,17 @@ class DataService {
         if (this.isOnline()) {
             try {
                 await onlineAction();
+                console.log(`✅ [${context}] Firebase запись успешна`);
+                // В online режиме Firebase listeners сами обновят UI
+                // Но для мгновенного отклика также вызываем offlineAction
+                offlineAction();
             } catch (error) {
                 console.warn(`[${context}] Operation failed, switching to offline:`, error);
                 this.enableOfflineMode();
                 offlineAction();
             }
         } else {
+            console.log(`📴 [${context}] Offline режим, локальная запись`);
             offlineAction();
         }
     }
