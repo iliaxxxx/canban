@@ -83,6 +83,8 @@ const callClaudeWithTimeout = async (
     const timeoutId = setTimeout(() => controller.abort(), AI_REQUEST_TIMEOUT);
 
     try {
+        console.log('🔄 Отправляю запрос к Claude API...');
+
         // Call our serverless API endpoint instead of Anthropic directly
         const response = await fetch('/api/claude', {
             method: 'POST',
@@ -102,23 +104,31 @@ const callClaudeWithTimeout = async (
 
         clearTimeout(timeoutId);
 
+        console.log('📡 Получен ответ от API:', response.status, response.statusText);
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
+            console.error('❌ Ошибка API:', errorData);
             throw new Error(`Claude API error: ${response.status} - ${JSON.stringify(errorData)}`);
         }
 
         const data = await response.json();
+        console.log('📦 Данные от Claude:', data);
 
         if (!data.content || !data.content[0] || !data.content[0].text) {
+            console.error('❌ Некорректный формат ответа:', data);
             throw new Error('Invalid response format from Claude API');
         }
 
+        console.log('✅ Текст получен, длина:', data.content[0].text.length);
         return data.content[0].text;
     } catch (error) {
         clearTimeout(timeoutId);
         if (error instanceof Error && error.name === 'AbortError') {
+            console.error('⏱️ Таймаут запроса');
             throw new Error(`Request timeout after ${AI_REQUEST_TIMEOUT / 1000} seconds`);
         }
+        console.error('❌ Ошибка в callClaudeWithTimeout:', error);
         throw error;
     }
 };
@@ -473,6 +483,8 @@ export const generateContentIdeas = async (
     reelsFormat: string = 'mix',
     count: number = 10
 ): Promise<Array<{ title: string; description: string; platform: string }>> => {
+    console.log('🎯 generateContentIdeas вызвана с параметрами:', { topic, niche, platform, tone, reelsFormat, count });
+
     try {
         const toneDescriptions: Record<string, string> = {
             neutral: 'Нейтральный, профессиональный',
@@ -537,16 +549,21 @@ ${platform === 'instagram_reels' || platform === 'all' ? `ФОРМАТ REELS: ${
         ];
 
         const response = await callClaudeWithTimeout(messages, systemPrompt, 4096);
-        
+        console.log('📝 Сырой ответ от Claude (первые 500 символов):', response.substring(0, 500));
+
         const ideas = safeParseJSON<Array<{ title: string; description: string; platform: string }>>(
             response,
             []
         );
 
+        console.log('✨ Распарсенные идеи:', ideas);
+
         if (ideas.length === 0) {
+            console.error('❌ Массив идей пуст после парсинга');
             throw new Error('Не удалось распарсить идеи от Claude');
         }
 
+        console.log(`✅ Успешно сгенерировано ${ideas.length} идей`);
         return ideas;
     } catch (error) {
         safeLog(error, 'generateContentIdeas');

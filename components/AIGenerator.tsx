@@ -31,25 +31,47 @@ export const AIGenerator: React.FC<AIGeneratorProps> = ({ isOpen, onClose, onAdd
     if (!topic.trim()) return;
     setIsLoading(true);
     setError(null);
-    
+
     try {
-        const ideas = await generateContentIdeas(topic, niche || 'General', selectedPlatform, selectedTone, reelsFormat);
-        
+        console.log('🚀 Начинаю генерацию идей:', {
+            topic,
+            niche: niche || 'General',
+            platform: selectedPlatform,
+            tone: selectedTone,
+            reelsFormat
+        });
+
+        const ideas = await generateContentIdeas(
+            topic,
+            niche || 'General',
+            selectedPlatform,
+            selectedTone,
+            reelsFormat,
+            5  // Генерируем 5 идей для brainstorm
+        );
+
+        console.log('✅ Идеи получены:', ideas);
+
         if (ideas && ideas.length > 0) {
           const newTasks: Omit<Task, 'id' | 'columnId' | 'projectId'>[] = ideas.map((idea) => ({
             title: idea.title,
             description: idea.description,
             platform: idea.platform as SocialPlatform,
           }));
-          await onAddTasks(newTasks); // Wait for tasks to be added
+
+          console.log('📝 Создаю задачи:', newTasks);
+          await onAddTasks(newTasks);
+          console.log('✅ Задачи созданы успешно!');
+
           onClose();
           setTopic('');
         } else {
+            console.error('❌ Пустой массив идей');
             setError("Не удалось сгенерировать идеи. AI вернул пустой результат.");
         }
-    } catch (err) {
-        console.error(err);
-        setError("Ошибка при сохранении задач. Попробуйте еще раз.");
+    } catch (err: any) {
+        console.error('❌ Ошибка при генерации:', err);
+        setError(err?.message || "Ошибка при генерации идей. Проверьте консоль для деталей.");
     } finally {
         setIsLoading(false);
     }
